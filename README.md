@@ -2,6 +2,8 @@
 
 `MalScan` for Volatility 2.6 aims to detect hidden and injected code, it works similar to [`malfind`](https://github.com/volatilityfoundation/volatility/wiki/Command-Reference-Mal#malfind) official plugin, but it takes advantage of ClamAV to reduce false positives.
 
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+
 ## Installation
 
 You can install all dependencies with [setup.sh](setup.sh):
