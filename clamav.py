@@ -5,11 +5,12 @@ https://github.com/graingert/python-clamd
 '''
 
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+#
+# Ported to Python 3 for the Volatility 3 version of malscan.
 
 try:
     __version__ = __import__('pkg_resources').get_distribution('clamd').version
-except:
+except Exception:
     __version__ = ''
 
 # $Source$
@@ -38,7 +39,7 @@ class ResponseError(ClamdError):
 
 
 class BufferTooLongError(ResponseError):
-    """Class for errors with clamd using INSTREAM with a buffer lenght > StreamMaxLength in /etc/clamav/clamd.conf"""
+    """Class for errors with clamd using INSTREAM with a buffer length > StreamMaxLength in /etc/clamav/clamd.conf"""
 
 
 class ConnectionError(ClamdError):
@@ -51,7 +52,7 @@ class ClamdNetworkSocket(object):
     """
     def __init__(self, host='127.0.0.1', port=3310, timeout=None):
         """
-        class initialisation
+        class initialization
 
         host (string) : hostname or ip address
         port (int) : TCP port
@@ -287,7 +288,7 @@ class ClamdUnixSocket(ClamdNetworkSocket):
     """
     def __init__(self, path="/run/clamav/clamd.ctl", timeout=None):
         """
-        class initialisation
+        class initialization
 
         path (string) : unix socket path
         timeout (float or None) : socket timeout
