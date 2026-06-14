@@ -23,7 +23,7 @@ Module MalScan
 Scan with ClamAV for hidden and injected code
     
     Options:
-        --ful-scan: scan every VAD marked as executable
+        --full-scan: scan every VAD marked as executable
 ```
 
 You need to provide this project path as [first parameter to Volatility](https://github.com/volatilityfoundation/volatility/wiki/Volatility-Usage#specifying-additional-plugin-directories):

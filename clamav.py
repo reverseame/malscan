@@ -207,6 +207,10 @@ class ClamdNetworkSocket(object):
 
                 filename, reason, status = self._parse_response(result)
                 return (filename, status, reason)
+
+            # Empty response from clamd: report as OK instead of returning
+            # None, which would break callers that unpack the result tuple.
+            return (None, 'OK', None)
         finally:
             self._close_socket()
 

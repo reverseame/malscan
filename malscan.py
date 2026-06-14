@@ -14,6 +14,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '''
 
 import re
+import struct
 import StringIO
 
 import clamav
@@ -38,7 +39,7 @@ class MalScan(AbstractWindowsCommand):
     Scan with ClamAV for hidden and injected code
     
     Options:
-        --ful-scan: scan every VAD marked as executable
+        --full-scan: scan every VAD marked as executable
     """
 
     def __init__(self, config, *args, **kwargs):
@@ -46,6 +47,18 @@ class MalScan(AbstractWindowsCommand):
         self._config.add_option('FULL-SCAN', help='Scan every VAD marked as executable', action='store_true')
         self.addr_space = utils.load_as(self._config)
         self.av = clamav.ClamdUnixSocket()
+
+        """
+        Check clamd connectivity once up front. If it is unreachable, disable
+        ClamAV scanning and rely solely on the byte-based heuristics instead of
+        failing (and warning) on every single VAD during the scan.
+        """
+        try:
+            self.av.ping()
+            self._av_available = True
+        except clamav.ClamdError as e:
+            debug.warning("ClamAV unavailable, using heuristics only: {0}".format(e))
+            self._av_available = False
 
     def _is_vad_empty(self, vad, address_space):
         """
@@ -182,10 +195,11 @@ class MalScan(AbstractWindowsCommand):
 
                 """Dissassemble opcodes if it is not a PE header"""
                 if has_distorm3 and not self._is_pe(vad_bytes): # MZ
+                    bits = self.addr_space.profile.metadata.get("memory_model", "32bit")
                     outfd.write('\n')
                     outfd.write("\n".join(
                         ["{0:#010x}  {1:<30}  {2}".format(o, h, i)
-                        for o, i, h in Disassemble(vad_bytes[where:where+64], vad.Start + where)
+                        for o, i, h in Disassemble(vad_bytes[where:where+64], vad.Start + where, bits)
                         ]))
                 outfd.write('\n')
 
@@ -199,7 +213,19 @@ class MalScan(AbstractWindowsCommand):
 
         @returns tuple of (message, offset)
         """
-        _, status, result = self.av.instream(StringIO.StringIO(data))
+        """
+        Scan with ClamAV. On any clamd communication error (daemon down,
+        wrong socket path, buffer larger than StreamMaxLength, ...) degrade
+        gracefully to the byte-based heuristics instead of crashing the
+        whole plugin in the middle of calculate().
+        """
+        status, result = 'ERROR', None
+        if self._av_available:
+            try:
+                _, status, result = self.av.instream(StringIO.StringIO(data))
+            except clamav.ClamdError as e:
+                debug.warning("ClamAV scan failed, using heuristics only: {0}".format(e))
+                self._av_available = False
 
         """ClamAV match"""
         if status == 'FOUND':
@@ -231,8 +257,8 @@ class MalScan(AbstractWindowsCommand):
         return None, None
 
     def _is_pe(self, data):
-        if data[:0x2] == '\x4d\x5a': # MZ
-            pe_offset = ord(data[0x3c])
+        if data[:0x2] == '\x4d\x5a' and len(data) >= 0x40: # MZ
+            pe_offset = struct.unpack('<I', data[0x3c:0x40])[0] # e_lfanew is a 4-byte DWORD
             if data[pe_offset:pe_offset+0x2] == '\x50\x45': # PE
                 return True
 
