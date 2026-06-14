@@ -60,7 +60,7 @@ Volatility 3 Framework 2.28.1
   |      |             |           |           |      |                        |              |               |                              |                                  | 0x53a0005: sub  rsp, 0x20 ...
 ```
 
-When ClamAV recognises a region, the `Result` column shows the signature name
+When ClamAV recognizes a region, the `Result` column shows the signature name
 instead (e.g. `Win.Trojan.Alina-4`); otherwise one of the byte heuristics is
 reported, as above. The `Disasm` column requires the optional `capstone` package.
 
