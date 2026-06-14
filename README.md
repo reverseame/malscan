@@ -48,15 +48,21 @@ Scan with ClamAV for hidden and injected code.
   --clamd-socket CLAMD-SOCKET   Path to the clamd Unix socket (default: /run/clamav/clamd.ctl)
 ```
 
-Example:
+Example (Windows x64 image, `pretty` renderer):
 
 ```
-$ vol.py -p /path/to/malscan -f /path/to/memory.dump malscan.MalScan
-Volatility 3 Framework
+$ vol.py -r pretty -p /path/to/malscan -f /path/to/memory.dump malscan.MalScan
+Volatility 3 Framework 2.28.1
 
-PID   Process         Start     End       Tag   Protection              CommitCharge  PrivateMemory  Result              Hexdump   Disasm
-108   ALINA_HQWLKC.e  0xb30000  0xb54fff   VadS  PAGE_EXECUTE_WRITECOPY  5             1              Win.Trojan.Alina-4  ...       ...
+  | PID  | Process     | Start     | End       | Tag  | Protection             | CommitCharge | PrivateMemory | Result                       | Hexdump                          | Disasm
+* | 2420 | svchost.exe | 0x53a0000 | 0x53a0fff | VadS | PAGE_EXECUTE_READWRITE | 1            | 1             | Suspicious function prologue | 55 48 8d 2c 24 48 83 ec 20 ...   | 0x53a0000: push rbp
+  |      |             |           |           |      |                        |              |               |                              | 48 8b 01 48 8b 49 08 ff d0 ...   | 0x53a0001: lea  rbp, [rsp]
+  |      |             |           |           |      |                        |              |               |                              |                                  | 0x53a0005: sub  rsp, 0x20 ...
 ```
+
+When ClamAV recognises a region, the `Result` column shows the signature name
+instead (e.g. `Win.Trojan.Alina-4`); otherwise one of the byte heuristics is
+reported, as above. The `Disasm` column requires the optional `capstone` package.
 
 ## License
 
