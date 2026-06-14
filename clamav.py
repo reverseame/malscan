@@ -5,11 +5,12 @@ https://github.com/graingert/python-clamd
 '''
 
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+#
+# Ported to Python 3 for the Volatility 3 version of malscan.
 
 try:
     __version__ = __import__('pkg_resources').get_distribution('clamd').version
-except:
+except Exception:
     __version__ = ''
 
 # $Source$

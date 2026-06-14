@@ -1,7 +1,11 @@
-malscan was created in the middle of 2018 at RME, a part of the DisCo research group
-from University of Zaragoza focused on software and systems security.
+malscan was created in the middle of 2018 at RME, a part of the DisCo research group from University of Zaragoza focused on software and systems security.
 
-Here is a list of contributors in alphabetical order:
+This is the Volatility 3 port. The original Volatility 2.6 version is preserved on the volatility2-latest branch.
 
-    Daniel Uroz <duroz@unizar.es>
-    Ricardo J. Rodríguez <rjrodriguez@unizar.es>
+List of contributors in alphabetical order (by surname):
+
+    Ricardo J. Rodríguez
+    Daniel Uroz (original author)
+
+(c) RME-DisCo Research Group, University of Zaragoza (Spain)
+Visit our website to know more about us! https://www.reversea.me
